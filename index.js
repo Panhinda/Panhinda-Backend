@@ -21,6 +21,7 @@ db.connect((err) => {
 });
 */
 const app = express();
+app.use(express.json())
 app.use(customeAttributesRoutes)
 app.use(authorRoutes)
 app.use(postRoutes)
