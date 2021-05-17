@@ -39,4 +39,6 @@ router.get("/getAllUsers", (req, res) => {
     })
 
 })
+// CREATE USER
+
 module.exports = router;

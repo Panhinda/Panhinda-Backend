@@ -103,6 +103,8 @@ router.post("/createPost", (req, res) => {
                     }
                     else {
                         //update the post_author table
+
+                        
                     }
                 }
 
@@ -114,9 +116,18 @@ router.post("/createPost", (req, res) => {
     res.send({
         statusCode: 200,
         msg: "success",
-        results: finalRes
+        results: {
+
+        } //should return the Idof the post created
     })
     //check for custom attributes: first decide how to get the customer attributes
 })
+
+
+//EDIT A POST 
+
+
+
+//DELETE A POST 
 
 module.exports = router;
