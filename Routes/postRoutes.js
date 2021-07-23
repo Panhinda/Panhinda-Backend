@@ -192,7 +192,16 @@ router.get("/getPost/:id", async (req, res) => {
             msg: "success",
             data: data
         })
+        
 
+
+          }
+          else{
+            res.send({
+                status:500,
+                msg:"failure",
+                error: "Server Error"
+            })
 
           }
 
