@@ -12,46 +12,195 @@ const db = require('../Db/db')
 
 */
 //GET ALL POSTS
-router.get("/getAllPosts", (req, res) => {
+
+async function getAllPosts() {
+
+    //this functions retun type is promise
+
+    //If the return value is not explicitly a promise, it will be implicitly wrapped in a promise.
 
     let sql = 'SELECT * FROM post';
-    let query = db.query(sql, (err, results) => {
-        if (err) {
-            console.log(err);
-            throw err;
-        }
-        else {
+    let query = await new Promise((resolve, reject) => {
 
-            console.log(results)
-            res.send({
-                statusCode: 200,
-                msg: "Success",
-                payload: [...results]
-            })
-        }
+        let queryRes = db.query(sql, (err, results) => {
+
+            if (err) {
+                reject({
+                    statusCode: 500,
+                    msg: "failed",
+                    result: err
+                })
+            }
+            else {
+                resolve({
+                    statusCode: 200,
+                    msg: "Success",
+                    payload: results
+                })
+            }
+        })
+
     })
+
+    return query;
+}
+
+router.get("/getAllPosts", async (req, res) => {
+
+    console.log("This is get All posts")
+
+    try {
+        let result = await getAllPosts()
+        console.log("result", result)
+        if (result.statusCode == 200) {
+            res.send(result)
+        }
+
+    }
+    catch (err) {
+        console.log("error")
+        console.log(err)
+        //res.send(err)
+    }
+
 
 })
 
 //GET A POST BY ID
-router.get("/getPost/:id", (req, res) => {
 
-    let sql = `SELECT * FROM post WHERE post_id=${req.params.id}`;
-    let query = db.query(sql, (err, results) => {
-        if (err) {
-            console.log(err);
-            throw err;
-        }
-        else {
+async function getPostById(id) {
 
-            console.log(results)
-            res.send({
-                statusCode: 200,
-                msg: "Success",
-                payload: results
-            })
-        }
+    let sql = `SELECT * FROM post WHERE post_id=${id}`;
+    let query = await new Promise((resolve, reject) => {
+        let queryRes = db.query(sql, (err, results) => {
+            if (err) {
+                reject({
+                    statusCode: 500,
+                    msg: "failed",
+                    result: err
+                })
+            }
+            else {
+                resolve({
+                    statusCode: 200,
+                    msg: "success",
+                    result: results
+                })
+            }
+
+        })
+
     })
+
+    return query
+
+}
+
+async function getAuthor(postId) {
+
+
+    let sql = `SELECT * FROM author WHERE author_id IN (SELECT author_id FROM post_author  WHERE post_id =${postId})`;
+    let query = await new Promise((resolve, reject) => {
+
+        let queryRes = db.query(sql, (err, results) => {
+
+            if (err) {
+                reject({
+                    statusCode: 500,
+                    msg: "Error in sql code of getting author_id for post",
+                    result: err
+                })
+            }
+            else {
+
+                resolve({
+                    statusCode: 200,
+                    msg: "Getting author_id for post: Successful",
+                    result: results
+                })
+
+            }
+
+
+        })
+
+
+
+    })
+
+    return query
+}
+
+async function getCustomAttributes(post_id) {
+    //get the custom attribute items
+    let sql = `(SELECT * from custom_attribute WHERE customAttribute_Id IN (SELECT customAttribute_Id FROM post_customattribute WHERE post_id=${post_id}))`
+
+    let customAttr = await new Promise((resolve, reject) => {
+
+        let query = db.query(sql, (err, results) => {
+            if (err) {
+                reject({
+                    statusCode: 500,
+                    msg: "Error in getting author_id for post",
+                    result: err
+                })
+            }
+            else {
+                console.log("Nethmee nested SQL", results)
+                resolve({
+                    statusCode: 200,
+                    msg: "getting custom attribute ids  for the  post ",
+                    result: results
+                })
+            }
+
+
+        })
+
+
+
+    })
+
+    //console.log(" SIZE CUSTOM ATTRIBUTES:",customAttr)
+
+    return customAttr
+}
+
+
+router.get("/getPost/:id", async (req, res) => {
+
+    console.log("Get Post By Id")
+
+    try {
+        let post = await getPostById(req.params.id)
+        post_id = post.result[0].post_id
+
+        //get the author id from post_Author
+
+        let authors = await getAuthor(post_id)
+        
+
+        let customAttributes = await getCustomAttributes(post_id)
+
+          if(post.statusCode==200 && authors.statusCode==200 && customAttributes.statusCode==200){
+              console.log(" status code 3")
+              data = { ...post.result[0], author: authors.result, customAttributes: customAttributes.result }
+        console.log("data", data)
+
+        res.send({
+            status: 200,
+            msg: "success",
+            data: data
+        })
+
+
+          }
+
+      
+    }
+    catch (err) {
+        console.log(err)
+    }
 
 })
 
@@ -104,7 +253,7 @@ router.post("/createPost", (req, res) => {
                     else {
                         //update the post_author table
 
-                        
+
                     }
                 }
 

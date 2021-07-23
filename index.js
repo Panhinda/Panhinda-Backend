@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require("mysql");
+const cors = require('cors')
 const userRoutes = require('./Routes/userRoutes')
 const postRoutes = require('./Routes/postRoutes')
 const authorRoutes = require('./Routes/authorsRoutes')
@@ -21,6 +22,7 @@ db.connect((err) => {
 });
 */
 const app = express();
+app.use(cors())
 app.use(express.json())
 app.use(customeAttributesRoutes)
 app.use(authorRoutes)

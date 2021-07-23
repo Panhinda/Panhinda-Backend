@@ -115,7 +115,7 @@ if(existAuthor.result.length){
           else{
             res.send({
               statusCode: 200,
-              msg: "all entries of auhtor is successfully deleted",
+              msg: "all entries of author is successfully deleted",
               payload: results
             })
           }
