@@ -178,34 +178,34 @@ router.get("/getPost/:id", async (req, res) => {
         //get the author id from post_Author
 
         let authors = await getAuthor(post_id)
-        
+
 
         let customAttributes = await getCustomAttributes(post_id)
 
-          if(post.statusCode==200 && authors.statusCode==200 && customAttributes.statusCode==200){
-              console.log(" status code 3")
-              data = { ...post.result[0], author: authors.result, customAttributes: customAttributes.result }
-        console.log("data", data)
+        if (post.statusCode == 200 && authors.statusCode == 200 && customAttributes.statusCode == 200) {
+            console.log(" status code 3")
+            data = { ...post.result[0], author: authors.result, customAttributes: customAttributes.result }
+            console.log("data", data)
 
-        res.send({
-            status: 200,
-            msg: "success",
-            data: data
-        })
-        
-
-
-          }
-          else{
             res.send({
-                status:500,
-                msg:"failure",
+                status: 200,
+                msg: "success",
+                data: data
+            })
+
+
+
+        }
+        else {
+            res.send({
+                status: 500,
+                msg: "failure",
                 error: "Server Error"
             })
 
-          }
+        }
 
-      
+
     }
     catch (err) {
         console.log(err)
@@ -216,69 +216,83 @@ router.get("/getPost/:id", async (req, res) => {
 // CREATE A POST
 
 router.post("/createPost", (req, res) => {
-    //decide whether the author of the post is going to be compulosory
-    //check if there's a name of the author in th request body, if so check if that author is already there in the author table. and if not update author tabkek or update the post_author table.
-    //author should be an array
+    console.log(req.body);
+    const { user_id, title, content, type, author } = req.body;
 
-    const { user_id, title, content, type, author } = req.body
-    let finalRes;
-    if (user_id && title && content && author) {
+    if (user_id && title && content && author && type) {
         let post = { user_id, title, type, content }
 
         let sql1 = `INSERT INTO post SET ?`
 
-        let query = db.query(sql1, post, (err, results) => {
+        db.query(sql1, post, (err, results) => {
             if (err) {
-                console.log("failed to create the post" + err)
-                res.send({
-                    statusCode: 500,
-                    msg: "Failed to create the post",
+                res.status(401).json({
+                    msg: 'Database Error!',
                     error: err
                 });
+            } else {
+                let postID = results.insertId;
+                let sql = `SELECT author_id from author WHERE author.name=\"${author}\"`;
+                db.query(sql, (err, results) => {
+                    if (err) {
+                        res.status(401).json({
+                            msg: 'Database Error!',
+                            error: err
+                        });
+                    } else {
+                        if (results.length == 0) {
+                            let sql = `INSERT INTO author(name) VALUES(\"${author}\")`;
+                            db.query(sql, (err, results) => {
+                                if (err) {
+                                    res.status(401).json({
+                                        msg: 'Database Error!',
+                                        error: err
+                                    });
+                                } else {
+                                    let authorID = results.insertId;
+                                    let sql = `INSERT INTO post_author(post_id,author_id) VALUES(\"${postID}\",\"${authorID}\")`;
+                                    db.query(sql, (err, results) => {
+                                        if (err) {
+                                            res.status(401).json({
+                                                msg: 'Database Error!',
+                                                error: err
+                                            });
+                                        } else {
+                                            res.status(200).json({
+                                                msg: 'Successful',
+                                                success: true
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+                            let authorID = results[0].author_id;
+                            let sql = `INSERT INTO post_author(post_id,author_id) VALUES(\"${postID}\",\"${authorID}\")`;
+                            db.query(sql, (err, results) => {
+                                if (err) {
+                                    res.status(401).json({
+                                        msg: 'Database Error!',
+                                        error: err
+                                    });
+                                } else {
+                                    res.status(200).json({
+                                        msg: 'Successful',
+                                        success: true
+                                    });
+                                }
+                            })
+                        }
+                    }
+                })
             }
-            else {
-                console.log(results)
-                finalRes = results
-            }
-
-
         });
-        author.map(a => {
-
-            let sql = `SELECT author_id from author WHERE author.name=\"${a}\"`
-
-            let query = db.query(sql, (err, results) => {
-                if (err) { console.log(err) }
-                else {
-                    //console.log(results)
-                    if (results.length == 0) {
-                        console.log("its a new author")
-                        let sql = `INSERT INTO author(name) VALUES(\"${a}\")`
-                        let query = db.query(sql, (err, results) => {
-                            if (err) { console.log("err in inserting author") }
-                            else { console.log(results) }
-                        })
-                    }
-                    else {
-                        //update the post_author table
-
-
-                    }
-                }
-
-            })
-
-        })
+    } else {
+        res.status(401).json({msg:'All fields are required'});
+        // const error = new Error('All fields are required');
+        // error.statusCode = 422;
+        // throw error;
     }
-
-    res.send({
-        statusCode: 200,
-        msg: "success",
-        results: {
-
-        } //should return the Idof the post created
-    })
-    //check for custom attributes: first decide how to get the customer attributes
 })
 
 
