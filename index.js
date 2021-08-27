@@ -1,10 +1,11 @@
 const express = require('express');
 const mysql = require("mysql");
-const cors = require('cors')
-const userRoutes = require('./Routes/userRoutes')
-const postRoutes = require('./Routes/postRoutes')
-const authorRoutes = require('./Routes/authorsRoutes')
-const customeAttributesRoutes = require('./Routes/customeAttributesRoutes')
+const cors = require('cors');
+const supportingRoutes = require('./Routes/supportingRoutes');
+const userRoutes = require('./Routes/userRoutes');
+const postRoutes = require('./Routes/postRoutes');
+const authorRoutes = require('./Routes/authorsRoutes');
+const customeAttributesRoutes = require('./Routes/customeAttributesRoutes');
 //create mysql connection
 /*const db = mysql.createConnection({
     host: 'localhost',
@@ -28,7 +29,7 @@ app.use(customeAttributesRoutes)
 app.use(authorRoutes)
 app.use(postRoutes)
 app.use(userRoutes)
-
+app.use(supportingRoutes)
 
 // create db
 /* app.get('/createdb', (req, res) => {

@@ -226,16 +226,19 @@ router.post("/createPost", (req, res) => {
 
         db.query(sql1, post, (err, results) => {
             if (err) {
-                res.status(401).json({
+
+                console.log("Error in create 1",err)
+                res.status(502).json({
                     msg: 'Database Error!',
                     error: err
+                    
                 });
             } else {
                 let postID = results.insertId;
                 let sql = `SELECT author_id from author WHERE author.name=\"${author}\"`;
                 db.query(sql, (err, results) => {
                     if (err) {
-                        res.status(401).json({
+                        res.status(502).json({
                             msg: 'Database Error!',
                             error: err
                         });
@@ -244,7 +247,7 @@ router.post("/createPost", (req, res) => {
                             let sql = `INSERT INTO author(name) VALUES(\"${author}\")`;
                             db.query(sql, (err, results) => {
                                 if (err) {
-                                    res.status(401).json({
+                                    res.status(502).json({
                                         msg: 'Database Error!',
                                         error: err
                                     });
