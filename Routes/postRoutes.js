@@ -227,11 +227,11 @@ router.post("/createPost", (req, res) => {
         db.query(sql1, post, (err, results) => {
             if (err) {
 
-                console.log("Error in create 1",err)
+                console.log("Error in create 1", err)
                 res.status(502).json({
                     msg: 'Database Error!',
                     error: err
-                    
+
                 });
             } else {
                 let postID = results.insertId;
@@ -291,7 +291,7 @@ router.post("/createPost", (req, res) => {
             }
         });
     } else {
-        res.status(401).json({msg:'All fields are required'});
+        res.status(401).json({ msg: 'All fields are required' });
         // const error = new Error('All fields are required');
         // error.statusCode = 422;
         // throw error;
