@@ -217,7 +217,7 @@ router.get("/getPost/:id", async (req, res) => {
 
 router.post("/createPost", (req, res) => {
     console.log(req.body);
-    const { user_id, title, content, type, author } = req.body;
+    const { user_id, title, content, type, author, customAttributes } = req.body; //add custom attributes
 
     if (user_id && title && content && author && type) {
         let post = { user_id, title, type, content }
@@ -234,6 +234,8 @@ router.post("/createPost", (req, res) => {
 
                 });
             } else {
+
+                //adding author
                 let postID = results.insertId;
                 let sql = `SELECT author_id from author WHERE author.name=\"${author}\"`;
                 db.query(sql, (err, results) => {
@@ -255,17 +257,17 @@ router.post("/createPost", (req, res) => {
                                     let authorID = results.insertId;
                                     let sql = `INSERT INTO post_author(post_id,author_id) VALUES(\"${postID}\",\"${authorID}\")`;
                                     db.query(sql, (err, results) => {
-                                        if (err) {
+                                        if (err) { 
                                             res.status(401).json({
                                                 msg: 'Database Error!',
                                                 error: err
                                             });
-                                        } else {
+                                        } /* else {
                                             res.status(200).json({
                                                 msg: 'Successful',
                                                 success: true
                                             });
-                                        }
+                                        } */
                                     })
                                 }
                             })
@@ -278,16 +280,94 @@ router.post("/createPost", (req, res) => {
                                         msg: 'Database Error!',
                                         error: err
                                     });
-                                } else {
+                                } /* else {
                                     res.status(200).json({
                                         msg: 'Successful',
                                         success: true
                                     });
-                                }
+                                } */
                             })
                         }
+
+
                     }
                 })
+
+                //adding custom attributes
+                let custom = [{
+                    key_value: "country",
+                    value: "India"
+                },
+                {
+                    key_value: "language",
+                    value: "Hindi"
+                },
+
+                ]
+
+                sql = `INSERT INTO custom_attribute (key_value,value) VALUES `
+                custom.forEach((obj,indx)=>{
+                          
+                    if(indx === custom.length-1){
+                        sql= sql+`(\"${obj.key_value}\",\"${obj.value}\");`
+                        
+                    }
+                    else{
+                        sql= sql+`(\"${obj.key_value}\",\"${obj.value}\"),`
+                    }
+
+                })
+             
+                db.query(sql, (err, results) => {
+                    if (err) {
+                        //console.log(err)
+                        res.status(401).json({
+                            msg: 'Database Error!',
+                            error: err
+                        });
+                    } else {
+                        //console.log("CA",results)
+                        const newId1 = results.insertId;
+                        const noRows =  results.affectedRows;
+                        sql = `INSERT INTO post_customattribute (post_id,customAttribute_Id) VALUES `
+                        for(let i=0;i<noRows;i++)
+                        {
+
+                            if(i== noRows-1){
+                                sql= sql+`(${postID},${newId1+i});`
+                            }
+                            else{
+                                sql= sql+`(${postID},${newId1+i}),`
+                            }
+                            
+
+                        }
+                        console.log("post_ca",sql)
+                        db.query(sql, (err, results) => {
+                            if (err) { 
+                               // console.log("Post_Ca_updated error",err);
+                                res.status(401).json({
+                                    msg: 'Database Error!',
+                                    error: err
+                                });
+                            }  else {
+                                //console.log("Post_Ca_updated",results);
+                                res.status(200).json({
+                                    msg: 'Successful',
+                                    success: true
+                                });
+                            } 
+                        })
+
+                        /* res.status(200).json({
+                            msg: 'Successful',
+                            success: true
+                        }); */
+                    }
+                })
+
+
+
             }
         });
     } else {
