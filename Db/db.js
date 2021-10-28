@@ -1,11 +1,19 @@
 const mysql = require('mysql');
-const  settings = require('./settings');
+//const  settings = require('./settings');
 var db;
+
+console.log(process.env.DB_URL);
 
 function connectDatabase() {
     if (!db) {
         db = mysql.createConnection(
-           settings
+            {
+                host: process.env.DB_URL, 
+                user: process.env.DB_USER,
+                password: process.env.DB_AUTH, 
+                database: process.env.DB_DATABASE
+            
+            }
         );
 
         db.connect(function(err){

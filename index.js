@@ -1,9 +1,22 @@
 const express = require('express');
 const mysql = require("mysql");
+
+const dotenv = require('dotenv');
+dotenv.config({ path: './config/config.env' });
+
+
+console.log(process.env.DB_URL);
+
 const userRoutes = require('./Routes/userRoutes')
 const postRoutes = require('./Routes/postRoutes')
 const authorRoutes = require('./Routes/authorsRoutes')
 const customeAttributesRoutes = require('./Routes/customeAttributesRoutes')
+
+const cors = require('cors');
+
+
+
+
 //create mysql connection
 /*const db = mysql.createConnection({
     host: 'localhost',
@@ -21,6 +34,7 @@ db.connect((err) => {
 });
 */
 const app = express();
+app.use(cors())
 app.use(customeAttributesRoutes)
 app.use(authorRoutes)
 app.use(postRoutes)
