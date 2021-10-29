@@ -1,13 +1,9 @@
 const mysql = require('mysql');
 //const  settings = require('./settings');
 var db;
-<<<<<<< HEAD
 
-console.log(process.env.DB_URL);
+//console.log(process.env.DB_URL);
 
-=======
-// DO ERROR HANDLING 
->>>>>>> aw/createPost
 function connectDatabase() {
     if (!db) {
         db = mysql.createConnection(

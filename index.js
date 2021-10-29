@@ -3,6 +3,7 @@ const mysql = require("mysql");
 
 const dotenv = require('dotenv');
 dotenv.config({ path: './config/config.env' });
+const supportingRoutes = require('./Routes/supportingRoutes');
 
 
 console.log(process.env.DB_URL);
