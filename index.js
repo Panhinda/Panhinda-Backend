@@ -35,10 +35,6 @@ db.connect((err) => {
 */
 const app = express();
 app.use(cors())
-<<<<<<< HEAD
-=======
-app.use(express.json())
->>>>>>> aw/createPost
 app.use(customeAttributesRoutes)
 app.use(authorRoutes)
 app.use(postRoutes)
