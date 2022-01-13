@@ -227,7 +227,7 @@ router.post("/createPost", (req, res) => {
         db.query(sql1, post, (err, results) => {
             if (err) {
 
-                console.log("Error in create 1", err)
+                console.log("Error in create 01", err)
                 res.status(502).json({
                     msg: 'Database Error!',
                     error: err
@@ -306,14 +306,14 @@ router.post("/createPost", (req, res) => {
                 ]
 
                 sql = `INSERT INTO custom_attribute (key_value,value) VALUES `
-                custom.forEach((obj,indx)=>{
+                customAttributes.forEach((obj,indx)=>{
                           
-                    if(indx === custom.length-1){
-                        sql= sql+`(\"${obj.key_value}\",\"${obj.value}\");`
+                    if(indx === customAttributes.length-1){
+                        sql= sql+`(\"${obj.key}\",\"${obj.value}\");`
                         
                     }
                     else{
-                        sql= sql+`(\"${obj.key_value}\",\"${obj.value}\"),`
+                        sql= sql+`(\"${obj.key}\",\"${obj.value}\"),`
                     }
 
                 })
