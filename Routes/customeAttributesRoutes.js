@@ -124,6 +124,76 @@ router.get("/getValuesByKey/:key", async (req, res) => {
    
 })
 
+//get the custom attribute primary keys when the post id is present.
+
+getCustomAttributesList = async (postId)=>{
+
+// get a list of CA attribute primary keys ---> postCA table
+
+let sql = `SELECT customAttribute_Id from post_customattribute WHERE post_id="${postId}"`;
+
+let query = await new Promise((resolve, reject) => {
+
+
+    let queryRes = db.query(sql, (err, results) => {
+
+        if (err) {
+            reject({
+                statusCode: 500,
+                msg: "Error in getting customAttributeId for the post_id",
+                result: err
+            })
+
+        }
+        else {
+            console.log("CA keys list",results[0])
+            resolve({
+                statusCode: 200,
+                msg: "success!",
+                result: results
+            }
+
+            )
+
+        }
+
+
+    })
+   // console.log("value of query res in CA",query)
+  
+
+
+})
+
+
+
+// access CA table as a an array of objects with key and value pairs.
+
+
+}
+
+router.get("/getCAPrimaryKeys/:postId", async (req, res) => {
+
+    try{
+        data = await getCustomAttributesList(req.params.postId)
+        console.log("relevant custom attributes list",data)
+        res.send({
+            statusCode: 200,
+            data:{},
+            msg: " custom attributes get all keys success"
+    
+        })
+
+    }
+    catch(e){
+        res.send(e)
+    }
+   
+})
+
+
+
+
 
 
 
