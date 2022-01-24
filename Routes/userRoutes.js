@@ -63,10 +63,10 @@ getUserbyUserName = async (username) => {
 
             }
             else {
-console.log("RESULTS",results)
+                console.log("RESULTS", results)
                 resolve({
-                   /*  statusCode: 200,
-                    msg: "getting user details ", */
+                    /*  statusCode: 200,
+                     msg: "getting user details ", */
                     result: results
 
 
@@ -75,42 +75,42 @@ console.log("RESULTS",results)
         })
 
     })
-return user
+    return user
 }
 
 router.post("/login", async (req, res) => {
     console.log(req.body);
-    const { username,password } = req.body;
+    const { username, password } = req.body;
 
 
 
     let getUser = await getUserbyUserName(username);
 
-    console.log("get User",getUser)
-   // let {user_id,passWord}=getUser.result[0]
+    console.log("get User", getUser)
+    // let {user_id,passWord}=getUser.result[0]
     if (getUser.result[0]) {
-        let {user_id,passWord}=getUser.result[0]
-       if(password==passWord){
-        console.log("log in succes!")
-        res.send({
-            statusCode: 200,
-            msg: "log in sucess!",
-            result:{
-                ...getUser.result[0],
-                token:""
-                // token should be included going forward.
+        let { user_id, passWord } = getUser.result[0]
+        if (password == passWord) {
+            console.log("log in succes!")
+            res.send({
+                statusCode: 200,
+                msg: "log in sucess!",
+                result: {
+                    ...getUser.result[0],
+                    token: ""
+                    // token should be included going forward.
 
-            }
-        })
-       }
-       else{
+                }
+            })
+        }
+        else {
 
-        res.send({
+            res.send({
 
-            statusCode: 401,
-            msg: "lpasswords didnt match!",
-        })
-       }
+                statusCode: 401,
+                msg: "passwords didnt match!",
+            })
+        }
     }
     else {
 
